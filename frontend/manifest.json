@@ -1,0 +1,17 @@
+{
+  "name": "National Blockchain E-Voting System",
+  "short_name": "E-Voting",
+  "description": "Secure, Transparent, Tamper-Proof Digital Voting powered by Ethereum Blockchain",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#050d1a",
+  "theme_color": "#050d1a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗳️</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

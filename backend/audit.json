@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "action": "ADMIN_LOGIN",
+    "details": {
+      "username": "admin"
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "node",
+    "timestamp": "2026-08-25T08:17:18.488Z"
+  },
+  {
+    "id": 2,
+    "action": "VOTER_REGISTER_NATIONAL",
+    "details": {
+      "aadhaarHash": "2a33349e7e606a8a...",
+      "district": "Chennai",
+      "emailSent": false
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "node",
+    "timestamp": "2026-08-25T08:17:25.356Z"
+  },
+  {
+    "id": 3,
+    "action": "VOTER_REGISTER_NATIONAL",
+    "details": {
+      "aadhaarHash": "f1baafb72e1cc8b1...",
+      "district": "Mumbai Suburban",
+      "city": "Mumbai",
+      "mobile": "9876543210",
+      "emailSent": false
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "node",
+    "timestamp": "2026-08-25T08:21:44.974Z"
+  },
+  {
+    "id": 4,
+    "action": "OTP_VERIFIED",
+    "details": {
+      "identityHash": "f1baafb72e1cc8b1...",
+      "type": "national"
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "node",
+    "timestamp": "2026-08-25T08:21:52.608Z"
+  },
+  {
+    "id": 5,
+    "action": "VOTER_REGISTER_NATIONAL",
+    "details": {
+      "aadhaarHash": "8b908883dcb32d57...",
+      "district": "Madurai",
+      "emailSent": false
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-25T08:33:47.609Z"
+  },
+  {
+    "id": 6,
+    "action": "OTP_FAILED",
+    "details": {
+      "identityHash": "8b908883dcb32d57..."
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-25T08:34:22.360Z"
+  },
+  {
+    "id": 7,
+    "action": "OTP_VERIFIED",
+    "details": {
+      "identityHash": "8b908883dcb32d57...",
+      "type": "national"
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-25T08:34:36.305Z"
+  },
+  {
+    "id": 8,
+    "action": "ADMIN_LOGIN",
+    "details": {
+      "username": "admin"
+    },
+    "ip": "127.0.0.1",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-25T08:35:21.502Z"
+  }
+]

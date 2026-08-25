@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="College & Institutional Blockchain E-Voting System — Student Union & Campus Elections powered by Ethereum blockchain.">
+    <meta name="theme-color" content="#050d1a">
+    <title>🎓 College Blockchain E-Voting System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body class="college-accent">
+    <!-- Tricolor Top Bar -->
+    <div class="tricolor-bar"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Pause Overlay -->
+    <div id="pauseOverlay" class="pause-overlay">
+        <div class="pause-message">
+            <h2>⚠️ SYSTEM PAUSED</h2>
+            <p data-i18n="pause_msg">Election has been temporarily paused by the administrator.</p>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeReceiptModal()">✕</button>
+            <h2 style="text-align:center; margin-bottom:0.5rem;">🎓 <span data-i18n="vote_certificate">Digital Vote Certificate</span></h2>
+            <p class="card-description" style="text-align:center;" data-i18n="receipt_desc">Your vote has been securely recorded on the blockchain.</p>
+            <img id="receiptQR" class="receipt-qr" alt="Vote Verification QR" width="200" height="200">
+            <div id="receiptDetails" class="receipt-details"></div>
+            <button onclick="downloadReceipt()" class="btn-primary" style="width:100%; margin-top:1rem;">📥 <span data-i18n="download_receipt">Download Receipt</span></button>
+        </div>
+    </div>
+
+    <div class="app-wrapper">
+        <div class="container">
+            <!-- Header -->
+            <header>
+                <div class="chakra-container">
+                    <div style="font-size: 3.5rem; animation: pulse 2s infinite;">🎓</div>
+                </div>
+                <h1 class="brand-title" data-i18n="college_title">College Student Union Election</h1>
+                <p class="brand-subtitle" data-i18n="college_subtitle">Campus Democracy & Representative Governance</p>
+                <div class="brand-tagline">
+                    <span class="tag-secure" data-i18n="secure">Secure</span>
+                    <span class="tag-transparent" data-i18n="transparent">Transparent</span>
+                    <span class="tag-tamper" data-i18n="tamperproof">Tamper-Proof</span>
+                </div>
+            </header>
+
+            <!-- i18n Language Switcher -->
+            <div class="i18n-switcher">
+                <button class="i18n-btn active" onclick="setLanguage('en')">English</button>
+                <button class="i18n-btn" onclick="setLanguage('hi')">हिंदी</button>
+                <button class="i18n-btn" onclick="setLanguage('ta')">தமிழ்</button>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-bar">
+                <a href="index.html" class="nav-link" id="nav-national">🇮🇳 <span data-i18n="national">National</span></a>
+                <a href="college.html" class="nav-link active" id="nav-college">🎓 <span data-i18n="college">College</span></a>
+                <a href="admin.html" class="nav-link" id="nav-admin">👑 <span data-i18n="admin">Admin</span></a>
+            </div>
+
+            <!-- Demo Mode Banner -->
+            <div id="demoBanner" class="demo-banner hidden">
+                ⚡ <span data-i18n="demo_mode">Demo Mode Active — MetaMask not detected. Blockchain interactions are simulated.</span>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div id="timerSection" class="hidden">
+                <div class="countdown-timer" id="countdownTimer">
+                    <div class="timer-block" id="timerHoursBlock">
+                        <div class="timer-value" id="timerHours">00</div>
+                        <div class="timer-label" data-i18n="hours">Hours</div>
+                    </div>
+                    <div class="timer-block" id="timerMinutesBlock">
+                        <div class="timer-value" id="timerMinutes">00</div>
+                        <div class="timer-label" data-i18n="minutes">Minutes</div>
+                    </div>
+                    <div class="timer-block" id="timerSecondsBlock">
+                        <div class="timer-value" id="timerSeconds">00</div>
+                        <div class="timer-label" data-i18n="seconds">Seconds</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Status -->
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div id="connectionStatus" class="status-badge status-warning">● <span data-i18n="wallet_not_connected">Wallet: Not Connected</span></div>
+            </div>
+
+            <!-- Stepper -->
+            <div class="step-indicator">
+                <div class="step-track">
+                    <div class="step active" id="step1">1</div>
+                    <div class="step-line" id="line1"></div>
+                    <div class="step" id="step2">2</div>
+                    <div class="step-line" id="line2"></div>
+                    <div class="step" id="step3">3</div>
+                    <div class="step-line" id="line3"></div>
+                    <div class="step" id="step4">4</div>
+                </div>
+            </div>
+
+            <!-- Section 1: Connect Wallet -->
+            <div id="section1" class="card">
+                <h2>🎓 <span data-i18n="welcome_student">Welcome, Student Voter</span></h2>
+                <p class="card-description" data-i18n="connect_desc_student">Connect your decentralized wallet to authenticate with your university registration details. Identity is verified via campus-linked OTP.</p>
+                <button id="connectBtn" class="btn-primary" style="width: 100%; font-size: 1.05rem; padding: 1.1rem;">
+                    🦊 <span data-i18n="connect_metamask">Connect MetaMask Wallet</span>
+                </button>
+                <p id="walletAddress" class="hidden" style="margin-top:1rem; font-family: 'Courier New', monospace; color: var(--saffron); text-align:center; font-size: 0.9rem;"></p>
+            </div>
+
+            <!-- Section 2: Student Registration & OTP -->
+            <div id="section2" class="card hidden">
+                <h2>🪪 <span data-i18n="student_auth">Student Verification</span></h2>
+                <p class="card-description" data-i18n="student_auth_desc">Enter your university register number and contact details to receive your one-time voting authorization code.</p>
+                
+                <div class="grid-inputs">
+                    <div class="input-group">
+                        <label data-i18n="reg_no_label">Register / Roll Number</label>
+                        <input type="text" id="registerNo" placeholder="e.g. 21CS042 or 910021104" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label data-i18n="phone_label">Mobile Number</label>
+                        <input type="tel" id="phone" placeholder="10-digit Mobile Number" maxlength="10">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label data-i18n="email_label">College / Personal Email</label>
+                    <input type="email" id="email" placeholder="student@college.edu">
+                </div>
+
+                <!-- CAPTCHA -->
+                <div class="captcha-container">
+                    <canvas id="captchaCanvas" class="captcha-canvas" width="160" height="50"></canvas>
+                    <input type="text" id="captchaInput" class="captcha-input" placeholder="Enter CAPTCHA" maxlength="6" style="margin-bottom:0;">
+                    <button class="captcha-refresh" onclick="generateCaptcha()" title="Refresh CAPTCHA">🔄</button>
+                </div>
+
+                <button id="registerBtn" class="btn-primary" style="width: 100%;">📲 <span data-i18n="send_otp">Send OTP Verification</span></button>
+
+                <div id="otpSection" class="hidden">
+                    <hr class="divider">
+                    <div id="otpDisplay" class="hidden" style="text-align:center; margin-bottom:1rem;">
+                        <p style="color: var(--saffron); font-size:0.85rem;" data-i18n="otp_fallback">Demo Mode — Your OTP:</p>
+                        <div id="otpCode" style="font-size:2rem; font-weight:800; letter-spacing:8px; color:var(--green-light); margin:0.5rem 0;"></div>
+                    </div>
+                    <div class="input-group">
+                        <label data-i18n="otp_label">One-Time Password</label>
+                        <input type="text" id="otp" placeholder="Enter 6-digit OTP" maxlength="6">
+                    </div>
+                    <button id="verifyOtpBtn" class="btn-success" style="width: 100%;">✅ <span data-i18n="verify_authorize">Verify & Authorize</span></button>
+                </div>
+            </div>
+
+            <!-- Section 3: Cast Vote -->
+            <div id="section3" class="card hidden">
+                <div class="flex-between" style="margin-bottom: 1.5rem;">
+                    <h2>🗳️ <span data-i18n="cast_vote">Cast Your Vote</span></h2>
+                    <div id="votingTimer" class="status-badge" data-i18n="status_loading">Status: Loading...</div>
+                </div>
+                
+                <div id="candidateList" class="grid">
+                    <div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 2rem;">
+                        <div class="loading-spinner" style="margin: 0 auto 1rem;"></div>
+                        <p data-i18n="loading_candidates">Loading candidates from blockchain...</p>
+                    </div>
+                </div>
+
+                <div id="commitInfo" class="commit-info hidden">
+                    <h4>✅ <span data-i18n="vote_committed">Vote Committed to Blockchain</span></h4>
+                    <p data-i18n="commit_desc">Your vote is hashed and secured on the blockchain. You must return to REVEAL your vote once the reveal phase begins for it to be counted.</p>
+                    <div class="flex-gap" style="margin-top:1rem;">
+                        <button onclick="showReceiptModal()" class="btn-info" style="flex:1;">🧾 <span data-i18n="view_receipt">View Receipt</span></button>
+                        <button onclick="nextVoter()" class="next-voter-btn" style="flex:1;">👤 <span data-i18n="next_voter">Next Voter</span></button>
+                    </div>
+                </div>
+
+                <!-- Reveal Section -->
+                <div id="revealSection" class="hidden" style="margin-top:1.5rem;">
+                    <hr class="divider">
+                    <h3>🔓 <span data-i18n="reveal_title">Reveal Your Vote</span></h3>
+                    <p class="card-description" data-i18n="reveal_desc">The reveal phase is active. Submit your secret to have your vote counted on the public ledger.</p>
+                    <div class="input-group">
+                        <label data-i18n="secret_label">Your Secret Passphrase</label>
+                        <input type="text" id="revealSecret" placeholder="Enter the secret you used during commit">
+                    </div>
+                    <button onclick="revealVote()" class="btn-success" style="width:100%;">🔓 <span data-i18n="reveal_btn">Reveal to Public Ledger</span></button>
+                </div>
+            </div>
+
+            <!-- Section 4: Results -->
+            <div id="section4" class="card hidden">
+                <h2>📊 <span data-i18n="results">Election Results</span></h2>
+                <p class="card-description" data-i18n="results_desc">Official final count retrieved from the immutable blockchain ledger.</p>
+                
+                <div id="resultsSummary" class="stats-grid" style="margin-bottom: 1.5rem;"></div>
+                
+                <!-- Chart.js Doughnut -->
+                <div class="chart-container">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+
+                <div id="resultsList" class="grid"></div>
+                
+                <div class="flex-gap" style="margin-top:2rem;">
+                    <button onclick="location.reload()" class="btn-secondary" style="flex:1;">🔄 <span data-i18n="restart">Restart Demo</span></button>
+                    <button onclick="nextVoter()" class="next-voter-btn" style="flex:1;">👤 <span data-i18n="next_voter">Next Voter</span></button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <span class="footer-flag">🎓</span>
+                <p data-i18n="college_footer_title">Institutional E-Voting Portal</p>
+                <p style="margin-top: 0.3rem;" data-i18n="footer_desc">Secured by Ethereum Smart Contracts • Built for Digital India</p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="toast">Message goes here</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="college.js"></script>
+</body>
+</html>

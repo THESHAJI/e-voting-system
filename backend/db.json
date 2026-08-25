@@ -1,0 +1,38 @@
+{
+  "users": [
+    {
+      "aadhaarHash": "f1baafb72e1cc8b1f857f9ed9f448249a7c5ee5116fe4dbbe69823744e3dc940",
+      "voterId": "IND987654",
+      "dob": "1998-05-15",
+      "district": "Mumbai Suburban",
+      "city": "Mumbai",
+      "mobile": "9876543210",
+      "pincode": "400001",
+      "walletAddress": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "verified": true,
+      "registeredAt": "2026-08-25T08:21:52.601Z"
+    },
+    {
+      "aadhaarHash": "8b908883dcb32d5761073b37cd11b021b4a94ffce794d6ebd4aa0e4ca0c7c357",
+      "voterId": "RCX2373526",
+      "dob": "2002-01-01",
+      "district": "Madurai",
+      "city": "",
+      "mobile": "",
+      "pincode": "625020",
+      "walletAddress": "0xA7B305b3F774cC1160DA780A6113a3659c74721f",
+      "verified": true,
+      "registeredAt": "2026-08-25T08:34:36.299Z"
+    }
+  ],
+  "collegeUsers": [],
+  "parties": [],
+  "votes": {},
+  "verifiedVoters": [],
+  "electionPhase": "SETUP",
+  "electionType": "NATIONAL",
+  "timerStart": null,
+  "timerDuration": 0,
+  "generationId": 1,
+  "paused": false
+}

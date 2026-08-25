@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Authority Console — National Blockchain E-Voting System. Complete election lifecycle control, audit trails, and live monitoring.">
+    <meta name="theme-color" content="#050d1a">
+    <title>👑 Admin Authority Console — Blockchain E-Voting</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+</head>
+<body>
+    <!-- Tricolor Top Bar -->
+    <div class="tricolor-bar"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <div class="app-wrapper">
+        <div class="container">
+            <!-- Header -->
+            <header>
+                <div class="chakra-container">
+                    <div class="ashoka-chakra"></div>
+                </div>
+                <h1 class="brand-title">Admin Authority Console</h1>
+                <p class="brand-subtitle">Election Commission of India — Blockchain Node Control</p>
+                <div class="brand-tagline">
+                    <span class="tag-secure">Cryptographic Authority</span>
+                    <span class="tag-transparent">Live Audit Trail</span>
+                    <span class="tag-tamper">Generation Scoped</span>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <div class="nav-bar">
+                <a href="index.html" class="nav-link" id="nav-national">🇮🇳 National Portal</a>
+                <a href="college.html" class="nav-link" id="nav-college">🎓 College Portal</a>
+                <a href="admin.html" class="nav-link active" id="nav-admin">👑 Admin Dashboard</a>
+            </div>
+
+            <!-- Demo Mode Banner -->
+            <div id="demoBanner" class="demo-banner hidden">
+                ⚡ Demo Mode Active — MetaMask not detected. Contract admin interactions simulated.
+            </div>
+
+            <!-- Login Section -->
+            <div id="loginSection" class="card">
+                <h2>🔒 Election Authority Authentication</h2>
+                <p class="card-description">Authorized Personnel Only — Secure JWT Session Authentication</p>
+                <div class="input-group">
+                    <label>Admin Identifier</label>
+                    <input id="username" placeholder="Enter username" value="admin" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>Master Security Key</label>
+                    <input id="password" type="password" placeholder="Enter password" value="admin@2026">
+                </div>
+                <button onclick="adminLogin()" class="btn-primary" style="width: 100%;">🔓 Authorize Authority Access</button>
+            </div>
+
+            <!-- Main Admin Sections -->
+            <div id="adminSection" class="hidden">
+                
+                <!-- Connection & Election Scope Card -->
+                <div class="card">
+                    <div class="flex-between">
+                        <div>
+                            <h2>⛓️ Smart Contract Authority</h2>
+                            <p class="card-description" style="margin-bottom:0.5rem;">Connected to Ethereum Hardhat Local Node: <code id="contractDisplay" style="color:var(--saffron);">0x5FbDB2315678afecb367f032d93F642f64180aa3</code></p>
+                        </div>
+                        <button onclick="adminLogout()" class="btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;">🚪 Logout</button>
+                    </div>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 1rem;">
+                        <button onclick="connectAdminWallet()" class="btn-primary" style="flex: 1; min-width: 200px;">🦊 Connect MetaMask Authority</button>
+                        <div id="adminWalletBadge" class="status-badge status-warning" style="margin: 0;">Wallet: Not Connected</div>
+                    </div>
+                </div>
+
+                <!-- Live Overview Stats Grid -->
+                <div class="card">
+                    <div class="flex-between" style="margin-bottom: 1rem;">
+                        <h2>📊 Live Election Metrics</h2>
+                        <button onclick="refreshAll()" class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">🔄 Sync Now</button>
+                    </div>
+                    <div class="stats-grid" id="adminStatsGrid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statPhase" style="font-size: 1.2rem; color: var(--saffron);">SETUP</div>
+                            <div class="stat-label">Phase</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statCandidates">0</div>
+                            <div class="stat-label">Candidates</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statRegistered">0</div>
+                            <div class="stat-label">Registered Voters</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statVotes">0</div>
+                            <div class="stat-label">Total Votes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statGenId">1</div>
+                            <div class="stat-label">Generation ID</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-Column Controls -->
+                <div class="grid">
+                    
+                    <!-- Candidate & Logo Management -->
+                    <div class="card">
+                        <h3>🏛️ Candidate Ballot Management</h3>
+                        <p class="card-description">Add officially recognized candidates or party tickets with logos.</p>
+                        
+                        <div class="input-group">
+                            <label>Party / Candidate Name</label>
+                            <input id="partyName" placeholder="e.g. National Democratic Alliance">
+                        </div>
+                        <div class="input-group">
+                            <label>Party Emoji / Symbol</label>
+                            <input id="partySymbol" placeholder="🏛️ or 🪷 or 🐘 or 🎓" value="🏛️">
+                        </div>
+                        <div class="input-group">
+                            <label>Party Logo / Photo</label>
+                            <input type="file" id="partyLogo" accept="image/*" style="padding:0.5rem;">
+                        </div>
+                        
+                        <button onclick="addParty()" class="btn-primary" style="width: 100%; margin-top:0.5rem;">➕ Add to Official Ballot</button>
+                        
+                        <hr class="divider">
+                        <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Registered Candidates</h4>
+                        <div id="partyList" class="flex-gap" style="min-height: 40px;"></div>
+                    </div>
+
+                    <!-- Phase & Lifecycle Control -->
+                    <div class="card">
+                        <h3>⚙️ Election Lifecycle Controls</h3>
+                        <p class="card-description">Cryptographic state transitions on the smart contract.</p>
+                        
+                        <div class="phase-controls">
+                            <button id="btnStartCommit" onclick="startVotingPhase()" class="btn-success">▶️ 1. Start Voting (Commit)</button>
+                            <button id="btnStartReveal" onclick="startRevealPhase()" class="btn-info">🔓 2. Open Reveal Phase</button>
+                            <button id="btnEndElection" onclick="endElectionPhase()" class="btn-danger">⏹️ 3. End Election & Finalize</button>
+                            <button id="btnTogglePause" onclick="togglePauseSystem()" class="btn-warning">⏸️ Emergency Freeze</button>
+                        </div>
+
+                        <hr class="divider">
+
+                        <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">⏱️ Set Synchronized Countdown Timer</h4>
+                        <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+                            <input id="timerDurationInput" type="number" placeholder="Seconds (e.g. 300)" value="300" style="margin-bottom:0;">
+                            <button onclick="setTimer()" class="btn-secondary" style="white-space:nowrap;">Set Timer</button>
+                        </div>
+
+                        <h4 style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">🔄 Atomic Fresh Start (Reset Demo)</h4>
+                        <button onclick="triggerFreshStart()" class="btn-danger" style="width: 100%;">⚡ Fresh Start (Increment Generation)</button>
+                    </div>
+                </div>
+
+                <!-- Live Results Chart -->
+                <div class="card">
+                    <div class="flex-between">
+                        <h2>📈 Live Cryptographic Vote Tally</h2>
+                        <button onclick="loadAdminResults()" class="btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.8rem;">🔄 Update Chart</button>
+                    </div>
+                    <div class="chart-container" style="max-width:450px;">
+                        <canvas id="adminChart"></canvas>
+                    </div>
+                    <div id="adminResultsList" class="grid" style="margin-top:1rem;"></div>
+                </div>
+
+                <!-- On-Chain Voter Authorization & Binding -->
+                <div class="card">
+                    <h3>🪪 Direct Voter On-Chain Authorization</h3>
+                    <p class="card-description">Grant explicit voting rights to Ethereum addresses or verify identity bindings.</p>
+                    <div class="grid-inputs">
+                        <div class="input-group">
+                            <label>Voter Ethereum Address</label>
+                            <input id="directVoterAddress" placeholder="0x... Wallet Address">
+                        </div>
+                        <div class="input-group" style="display:flex; align-items:flex-end;">
+                            <button onclick="directVerifyVoter()" class="btn-primary" style="width:100%; height:46px; margin-bottom:0.5rem;">✅ Authorize Address</button>
+                        </div>
+                    </div>
+                    <button onclick="batchVerifyPrompt()" class="btn-secondary" style="width:100%;">📋 Batch Authorize Multiple Addresses</button>
+                </div>
+
+                <!-- Real-Time Audit Trail & Export CSV -->
+                <div class="card">
+                    <div class="flex-between" style="margin-bottom: 0.5rem;">
+                        <h2>📝 Immutable Audit Trail & IP Logs</h2>
+                        <button onclick="exportCSV()" class="btn-success" style="padding:0.5rem 1.2rem; font-size:0.85rem;">📥 Export CSV for Excel</button>
+                    </div>
+                    <p class="card-description">Chronological log of voter registrations, commits, reveals, and administrative actions with IP tracking.</p>
+                    
+                    <div class="audit-scroll">
+                        <table class="audit-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                    <th>IP Address</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <tr><td colspan="5" style="text-align:center;">Loading audit trail...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Registered Voters Summary -->
+                <div class="card">
+                    <h2>👥 Registered Voters Registry</h2>
+                    <p class="card-description">Voters verified via simulated UIDAI / Aadhaar e-KYC or Student Register Number.</p>
+                    <div id="adminVotersList" class="voter-list">
+                        <p style="color: var(--text-dim); text-align: center; padding: 1rem;">Loading voters...</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <span class="footer-flag">🇮🇳</span>
+                <p>National Blockchain E-Voting System — Election Commission Authority Console</p>
+                <p style="margin-top: 0.3rem;">Smart Contract V3.1 • Zero Knowledge Commit-Reveal Architecture</p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="toast">Message goes here</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
