@@ -5,7 +5,7 @@
 
 let provider, signer, contract;
 let contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-let adminToken = localStorage.getItem("evoting_admin_token") || "";
+let adminToken = "";
 let isPausedState = false;
 let adminChart = null;
 let wsConnection = null;
@@ -76,33 +76,28 @@ async function init() {
 
     connectWebSocket();
 
-    if (adminToken) {
+    const storedToken = localStorage.getItem("evoting_admin_token");
+    if (storedToken) {
         // Validate the stored token with backend
         try {
             const check = await fetch(`${backendUrl}/verify-admin-token`, {
-                headers: { "Authorization": `Bearer ${adminToken}` }
+                headers: { "Authorization": `Bearer ${storedToken}` }
             });
             if (check.ok) {
+                adminToken = storedToken;
                 document.getElementById("loginSection").classList.add("hidden");
                 document.getElementById("adminSection").classList.remove("hidden");
                 refreshAll();
-            } else {
-                // Invalid or expired token -> clear and prompt login
-                localStorage.removeItem("evoting_admin_token");
-                adminToken = "";
-                document.getElementById("adminSection").classList.add("hidden");
-                document.getElementById("loginSection").classList.remove("hidden");
-                showToast("Admin session expired. Please sign in.", true);
+                return;
             }
-        } catch (e) {
-            // Backend offline or error -> show login
-            document.getElementById("adminSection").classList.add("hidden");
-            document.getElementById("loginSection").classList.remove("hidden");
-        }
-    } else {
-        document.getElementById("adminSection").classList.add("hidden");
-        document.getElementById("loginSection").classList.remove("hidden");
+        } catch (e) {}
     }
+
+    // Invalid or no token -> reset and show login
+    localStorage.removeItem("evoting_admin_token");
+    adminToken = "";
+    document.getElementById("adminSection").classList.add("hidden");
+    document.getElementById("loginSection").classList.remove("hidden");
 }
 
 init();

@@ -1,22 +1,6 @@
-const CACHE_NAME = "evoting-v3-cache";
-const ASSETS_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/college.html",
-  "/admin.html",
-  "/style.css",
-  "/index.js",
-  "/college.js",
-  "/admin.js",
-  "/manifest.json"
-];
+const CACHE_NAME = "evoting-v3.2-cache";
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
   self.skipWaiting();
 });
 
@@ -24,34 +8,27 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
+        keys.map((key) => caches.delete(key))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
-  // Network-first strategy for API calls, Cache-first for static assets
-  if (event.request.url.includes("/api/") || 
-      event.request.url.includes("/register") || 
-      event.request.url.includes("/verify-otp") ||
-      event.request.url.includes("/stats") ||
-      event.request.url.includes("/results") ||
-      event.request.url.includes("/parties") ||
-      event.request.url.includes("/cast-vote")) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then((response) => {
-        return response || fetch(event.request);
-      })
-    );
+  // Always Network-First strategy
+  if (event.request.method !== "GET") {
+    return;
   }
+
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone)).catch(() => {});
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
+  );
 });
