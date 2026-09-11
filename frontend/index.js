@@ -471,21 +471,27 @@ async function init() {
 
 init();
 
+function enableInstantDemoVoter() {
+    demoMode = true;
+    currentWallet = "0x" + Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b => b.toString(16).padStart(2,"0")).join("");
+    document.getElementById("walletAddress").innerText = `Linked: ${currentWallet.slice(0,6)}...${currentWallet.slice(-4)}`;
+    document.getElementById("walletAddress").classList.remove("hidden");
+
+    const status = document.getElementById("connectionStatus");
+    status.innerHTML = `● Instant Citizen Wallet: ${currentWallet.slice(0,6)}...${currentWallet.slice(-4)}`;
+    status.classList.remove("status-warning");
+    status.classList.add("status-online");
+
+    showToast("⚡ Instant Voter Session Active (No Popups)");
+    showSection("section2");
+}
+window.enableInstantDemoVoter = enableInstantDemoVoter;
+
 // ═══════════════ 1. CONNECT WALLET ═══════════════
 document.getElementById("connectBtn").onclick = async () => {
     try {
-        if (demoMode) {
-            currentWallet = "0xDemo" + Math.random().toString(16).substr(2, 34);
-            document.getElementById("walletAddress").innerText = `Linked: ${currentWallet.slice(0,10)}...${currentWallet.slice(-4)}`;
-            document.getElementById("walletAddress").classList.remove("hidden");
-
-            const status = document.getElementById("connectionStatus");
-            status.innerHTML = "● Demo Wallet Connected";
-            status.classList.remove("status-warning");
-            status.classList.add("status-online");
-
-            showToast("Demo Wallet Connected");
-            showSection("section2");
+        if (demoMode || !window.ethereum) {
+            enableInstantDemoVoter();
             return;
         }
 

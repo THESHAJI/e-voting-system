@@ -123,9 +123,14 @@
             <div id="section1" class="card">
                 <h2>🔐 <span data-i18n="welcome">Welcome, Citizen</span></h2>
                 <p class="card-description" data-i18n="connect_desc">Connect your secure decentralized wallet to begin the authentication process. Your identity will be verified through Aadhaar-linked OTP.</p>
-                <button id="connectBtn" class="btn-primary" style="width: 100%; font-size: 1.05rem; padding: 1.1rem;">
-                    🦊 <span data-i18n="connect_metamask">Connect MetaMask Wallet</span>
-                </button>
+                <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <button id="connectBtn" class="btn-primary" style="flex:1; min-width: 220px; font-size: 1.05rem; padding: 1.1rem;">
+                        🦊 <span data-i18n="connect_metamask">Connect MetaMask Wallet</span>
+                    </button>
+                    <button id="instantDemoBtn" onclick="enableInstantDemoVoter()" class="btn-secondary" style="flex:1; min-width: 220px; font-size: 1.05rem; padding: 1.1rem; border-color:var(--saffron); color:var(--saffron);">
+                        ⚡ Instant Voter Mode (Smooth Demo)
+                    </button>
+                </div>
                 <p id="walletAddress" class="hidden" style="margin-top:1rem; font-family: 'Courier New', monospace; color: var(--saffron); text-align:center; font-size: 0.9rem;"></p>
             </div>
 

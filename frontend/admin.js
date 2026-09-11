@@ -161,13 +161,21 @@ function adminLogout() {
     showToast("Authority Logged Out");
 }
 
-// ═══════════════ 2. CONNECT ADMIN WALLET ═══════════════
+function enableDemoAuthority() {
+    signer = null;
+    contract = null;
+    const badge = document.getElementById("adminWalletBadge");
+    badge.innerText = "● Local Node Authority (Active)";
+    badge.className = "status-badge status-online";
+    showToast("⚡ Local Authority Mode Activated (No MetaMask Popups)");
+    refreshAll();
+}
+
 async function connectAdminWallet() {
     try {
         if (!window.ethereum) {
-            document.getElementById("adminWalletBadge").innerText = "Demo Authority Mode";
-            document.getElementById("adminWalletBadge").className = "status-badge status-online";
-            return showToast("Demo Authority Active (No MetaMask)");
+            enableDemoAuthority();
+            return;
         }
 
         provider = new ethers.BrowserProvider(window.ethereum);
@@ -613,6 +621,7 @@ async function refreshAll() {
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 window.connectAdminWallet = connectAdminWallet;
+window.enableDemoAuthority = enableDemoAuthority;
 window.addParty = addParty;
 window.removeParty = removeParty;
 window.startVotingPhase = startVotingPhase;
