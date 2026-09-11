@@ -605,6 +605,23 @@ async function loadRegisteredVoters() {
 async function refreshAll() {
     try {
         const stats = await fetch(`${backendUrl}/stats`).then(r => r.json());
+        const currentType = stats.electionType || "NATIONAL";
+        const typeEl = document.getElementById("statElectionType");
+        if (typeEl) {
+            typeEl.innerText = currentType === "COLLEGE" ? "🎓 COLLEGE" : "🇮🇳 NATIONAL";
+            typeEl.style.color = currentType === "COLLEGE" ? "var(--college-accent, #8b5cf6)" : "#3b82f6";
+        }
+        const natBtn = document.getElementById("scopeNationalBtn");
+        const colBtn = document.getElementById("scopeCollegeBtn");
+        if (natBtn && colBtn) {
+            if (currentType === "COLLEGE") {
+                colBtn.className = "btn-primary";
+                natBtn.className = "btn-secondary";
+            } else {
+                natBtn.className = "btn-primary";
+                colBtn.className = "btn-secondary";
+            }
+        }
         document.getElementById("statPhase").innerText = stats.electionPhase || "SETUP";
         document.getElementById("statCandidates").innerText = stats.totalParties || 0;
         document.getElementById("statRegistered").innerText = stats.totalRegistered || 0;
@@ -618,10 +635,38 @@ async function refreshAll() {
     } catch (e) {}
 }
 
+async function setAdminElectionScope(scopeType) {
+    try {
+        showToast(`Setting Target Election Scope to ${scopeType}...`);
+        if (contract && signer) {
+            try {
+                const typeEnum = scopeType === "COLLEGE" ? 1 : 0;
+                const tx = await contract.setElectionType(typeEnum);
+                await tx.wait();
+            } catch (bcErr) {
+                console.warn("Blockchain setElectionType notice:", bcErr.message);
+            }
+        }
+
+        const res = await authFetch(`${backendUrl}/set-election-type`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: scopeType })
+        });
+        if (res && res.ok) {
+            showToast(`✅ Active Election Scope Switched to ${scopeType}!`);
+            refreshAll();
+        }
+    } catch (err) {
+        showToast("Failed to switch election scope", true);
+    }
+}
+
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 window.connectAdminWallet = connectAdminWallet;
 window.enableDemoAuthority = enableDemoAuthority;
+window.setAdminElectionScope = setAdminElectionScope;
 window.addParty = addParty;
 window.removeParty = removeParty;
 window.startVotingPhase = startVotingPhase;

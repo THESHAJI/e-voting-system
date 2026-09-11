@@ -96,6 +96,10 @@
                     </div>
                     <div class="stats-grid" id="adminStatsGrid">
                         <div class="stat-card">
+                            <div class="stat-value" id="statElectionType" style="font-size: 1.1rem; color: #3b82f6;">🇮🇳 NATIONAL</div>
+                            <div class="stat-label">Active Election</div>
+                        </div>
+                        <div class="stat-card">
                             <div class="stat-value" id="statPhase" style="font-size: 1.2rem; color: var(--saffron);">SETUP</div>
                             <div class="stat-label">Phase</div>
                         </div>
@@ -114,6 +118,18 @@
                         <div class="stat-card">
                             <div class="stat-value" id="statGenId">1</div>
                             <div class="stat-label">Generation ID</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Election Target Scope Switcher -->
+                    <div style="margin-top: 1.2rem; padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <strong style="color: var(--text-primary); font-size: 0.95rem;">🎯 Select Target Election to Control:</strong>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">Toggle whether voting phase and candidate registry applies to National or College election.</p>
+                        </div>
+                        <div style="display: flex; gap: 0.6rem;">
+                            <button id="scopeNationalBtn" onclick="setAdminElectionScope('NATIONAL')" class="btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">🇮🇳 National Portal</button>
+                            <button id="scopeCollegeBtn" onclick="setAdminElectionScope('COLLEGE')" class="btn-secondary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">🎓 College Portal</button>
                         </div>
                     </div>
                 </div>
