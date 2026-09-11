@@ -38,6 +38,30 @@ function showToast(msg, error = false) {
     setTimeout(() => toast.classList.remove("show"), 3500);
 }
 
+// ═══════════════ AUTH FETCH WRAPPER ═══════════════
+async function authFetch(url, options = {}) {
+    if (!options.headers) options.headers = {};
+    if (options.headers instanceof Headers) {
+        options.headers.set("Authorization", `Bearer ${adminToken}`);
+    } else {
+        options.headers["Authorization"] = `Bearer ${adminToken}`;
+    }
+
+    try {
+        const res = await fetch(url, options);
+        if (res.status === 401) {
+            localStorage.removeItem("evoting_admin_token");
+            adminToken = "";
+            document.getElementById("adminSection").classList.add("hidden");
+            document.getElementById("loginSection").classList.remove("hidden");
+            showToast("⚠️ Admin session expired. Please log in again (admin / admin@2026)", true);
+        }
+        return res;
+    } catch (err) {
+        throw err;
+    }
+}
+
 // ═══════════════ INIT ═══════════════
 async function init() {
     try {
@@ -53,10 +77,31 @@ async function init() {
     connectWebSocket();
 
     if (adminToken) {
-        // Auto-login session restore
-        document.getElementById("loginSection").classList.add("hidden");
-        document.getElementById("adminSection").classList.remove("hidden");
-        refreshAll();
+        // Validate the stored token with backend
+        try {
+            const check = await fetch(`${backendUrl}/verify-admin-token`, {
+                headers: { "Authorization": `Bearer ${adminToken}` }
+            });
+            if (check.ok) {
+                document.getElementById("loginSection").classList.add("hidden");
+                document.getElementById("adminSection").classList.remove("hidden");
+                refreshAll();
+            } else {
+                // Invalid or expired token -> clear and prompt login
+                localStorage.removeItem("evoting_admin_token");
+                adminToken = "";
+                document.getElementById("adminSection").classList.add("hidden");
+                document.getElementById("loginSection").classList.remove("hidden");
+                showToast("Admin session expired. Please sign in.", true);
+            }
+        } catch (e) {
+            // Backend offline or error -> show login
+            document.getElementById("adminSection").classList.add("hidden");
+            document.getElementById("loginSection").classList.remove("hidden");
+        }
+    } else {
+        document.getElementById("adminSection").classList.add("hidden");
+        document.getElementById("loginSection").classList.remove("hidden");
     }
 }
 
@@ -86,6 +131,10 @@ async function adminLogin() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
 
+    if (!username || !password) {
+        return showToast("Please enter username and password", true);
+    }
+
     try {
         const res = await fetch(`${backendUrl}/admin-login`, {
             method: "POST",
@@ -99,13 +148,13 @@ async function adminLogin() {
             localStorage.setItem("evoting_admin_token", adminToken);
             document.getElementById("loginSection").classList.add("hidden");
             document.getElementById("adminSection").classList.remove("hidden");
-            showToast("Authority Session Authenticated");
+            showToast("Authority Session Authenticated ✓");
             refreshAll();
         } else {
-            showToast(data.message || "Invalid Credentials", true);
+            showToast(data.message || "Invalid Credentials (Default: admin / admin@2026)", true);
         }
     } catch (err) {
-        showToast("Backend Server Offline", true);
+        showToast("Backend Server Offline. Check port 5000.", true);
     }
 }
 
@@ -145,6 +194,13 @@ async function connectAdminWallet() {
 
 // ═══════════════ 3. CANDIDATE MANAGEMENT ═══════════════
 async function addParty() {
+    if (!adminToken) {
+        showToast("Please log in as Admin first (admin / admin@2026)", true);
+        document.getElementById("adminSection").classList.add("hidden");
+        document.getElementById("loginSection").classList.remove("hidden");
+        return;
+    }
+
     const name = document.getElementById("partyName").value.trim();
     const symbol = document.getElementById("partySymbol").value.trim();
     const logoFile = document.getElementById("partyLogo").files[0];
@@ -158,11 +214,11 @@ async function addParty() {
 
     try {
         showToast("Recording candidate on server & blockchain...");
-        const res = await fetch(`${backendUrl}/add-party`, {
+        const res = await authFetch(`${backendUrl}/add-party`, {
             method: "POST",
-            headers: { "Authorization": `Bearer ${adminToken}` },
             body: formData
         });
+        if (!res) return;
         const data = await res.json();
 
         if (res.ok) {
@@ -186,7 +242,29 @@ async function addParty() {
             showToast(data.message || "Failed to add candidate", true);
         }
     } catch (err) {
-        showToast("Error adding candidate", true);
+        showToast(err.message || "Error adding candidate", true);
+    }
+}
+
+async function removeParty(id) {
+    if (!confirm("Are you sure you want to remove this candidate?")) return;
+    try {
+        const res = await authFetch(`${backendUrl}/remove-party`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id })
+        });
+        if (!res) return;
+        if (res.ok) {
+            showToast("Candidate removed");
+            loadParties();
+            refreshAll();
+        } else {
+            const data = await res.json();
+            showToast(data.message || "Failed to remove candidate", true);
+        }
+    } catch (e) {
+        showToast("Error removing candidate", true);
     }
 }
 
@@ -206,9 +284,13 @@ async function loadParties() {
             const badge = document.createElement("div");
             badge.className = "status-badge";
             badge.style.margin = "0";
+            badge.style.display = "inline-flex";
+            badge.style.alignItems = "center";
+            badge.style.gap = "8px";
             badge.innerHTML = `
                 ${p.logo ? `<img src="${p.logo}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;">` : (p.symbol || '🏛️')}
-                <span>${p.name}</span>
+                <span><strong>${p.name}</strong></span>
+                <button onclick="removeParty(${p.id})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;padding:0 2px;margin-left:4px;" title="Remove Candidate">✕</button>
             `;
             list.appendChild(badge);
         });
@@ -223,9 +305,9 @@ async function startVotingPhase() {
             const tx = await contract.startVoting();
             await tx.wait();
         }
-        await fetch(`${backendUrl}/set-phase`, {
+        await authFetch(`${backendUrl}/set-phase`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ phase: "COMMIT" })
         });
         showToast("🟢 VOTING PHASE IS LIVE!");
@@ -242,9 +324,9 @@ async function startRevealPhase() {
             const tx = await contract.startReveal();
             await tx.wait();
         }
-        await fetch(`${backendUrl}/set-phase`, {
+        await authFetch(`${backendUrl}/set-phase`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ phase: "REVEAL" })
         });
         showToast("🔵 REVEAL PHASE OPEN!");
@@ -261,9 +343,9 @@ async function endElectionPhase() {
             const tx = await contract.endElection();
             await tx.wait();
         }
-        await fetch(`${backendUrl}/set-phase`, {
+        await authFetch(`${backendUrl}/set-phase`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ phase: "ENDED" })
         });
         showToast("🔴 ELECTION ENDED & FINALIZED!");
@@ -282,9 +364,8 @@ async function togglePauseSystem() {
             const tx = isPausedState ? await contract.pauseSystem() : await contract.unpauseSystem();
             await tx.wait();
         }
-        await fetch(`${backendUrl}${endpoint}`, {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${adminToken}` }
+        await authFetch(`${backendUrl}${endpoint}`, {
+            method: "POST"
         });
         const btn = document.getElementById("btnTogglePause");
         btn.innerText = isPausedState ? "▶️ Unpause Freeze" : "⏸️ Emergency Freeze";
@@ -300,12 +381,12 @@ async function setTimer() {
     if (!duration || duration <= 0) return showToast("Enter a valid duration in seconds", true);
 
     try {
-        const res = await fetch(`${backendUrl}/set-timer`, {
+        const res = await authFetch(`${backendUrl}/set-timer`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ duration })
         });
-        if (res.ok) {
+        if (res && res.ok) {
             showToast(`⏱️ Timer set for ${duration} seconds!`);
         }
     } catch (e) {
@@ -323,10 +404,10 @@ async function triggerFreshStart() {
             await tx.wait();
         }
 
-        const res = await fetch(`${backendUrl}/fresh-start`, {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${adminToken}` }
+        const res = await authFetch(`${backendUrl}/fresh-start`, {
+            method: "POST"
         });
+        if (!res) return;
         const data = await res.json();
         showToast(`✅ Fresh Start Complete! Generation: ${data.generationId}`);
         refreshAll();
@@ -391,9 +472,8 @@ async function batchVerifyPrompt() {
 // ═══════════════ 6. AUDIT TRAIL & CSV EXPORT ═══════════════
 async function loadAuditLog() {
     try {
-        const res = await fetch(`${backendUrl}/audit-log`, {
-            headers: { "Authorization": `Bearer ${adminToken}` }
-        });
+        const res = await authFetch(`${backendUrl}/audit-log`);
+        if (!res) return;
         const logs = await res.json();
         const tbody = document.getElementById("auditTableBody");
         tbody.innerHTML = "";
@@ -539,6 +619,7 @@ window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
 window.connectAdminWallet = connectAdminWallet;
 window.addParty = addParty;
+window.removeParty = removeParty;
 window.startVotingPhase = startVotingPhase;
 window.startRevealPhase = startRevealPhase;
 window.endElectionPhase = endElectionPhase;

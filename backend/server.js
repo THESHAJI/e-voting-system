@@ -301,6 +301,10 @@ app.post("/admin-login", authLimiter, async (req, res) => {
     res.status(401).json({ message: "Invalid Admin Credentials" });
 });
 
+app.get("/verify-admin-token", verifyToken, adminOnly, (req, res) => {
+    res.json({ valid: true, user: req.user });
+});
+
 // ════════════════════ NATIONAL REGISTRATION ════════════════════
 
 app.post("/register", otpLimiter, async (req, res) => {
